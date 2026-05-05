@@ -10,6 +10,8 @@ import Mensalistas from "./pages/Mensalistas";
 import Avulsos from "./pages/Avulsos";
 import Caixa from "./pages/Caixa";
 import Membros from "./pages/Membros";
+import Gols from "./pages/Gols";
+import Tutorial from "./pages/Tutorial";
 import Publico from "./pages/Publico";
 import NotFound from "./pages/NotFound";
 
@@ -60,6 +62,22 @@ const App = () => (
               element={
                 <Layout>
                   <Membros />
+                </Layout>
+              }
+            />
+            <Route
+              path="/gols"
+              element={
+                <Layout>
+                  <Gols />
+                </Layout>
+              }
+            />
+            <Route
+              path="/tutorial"
+              element={
+                <Layout>
+                  <Tutorial />
                 </Layout>
               }
             />

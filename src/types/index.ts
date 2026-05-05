@@ -34,3 +34,17 @@ export interface CaixaEntry {
   data: string; // ISO date
   referencia?: string;
 }
+
+export interface GoalPlayer {
+  nome: string;
+  memberId?: string; // undefined = jogador avulso externo
+  gols: number;
+}
+
+export interface Jogo {
+  id: string;
+  data: string; // ex: "01/03/2026"
+  monthKey: string; // "YYYY-MM"
+  jogadores: GoalPlayer[];
+  createdAt: string;
+}

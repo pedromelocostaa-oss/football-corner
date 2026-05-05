@@ -7,6 +7,8 @@ import {
   Wallet,
   Users,
   Eye,
+  Trophy,
+  HelpCircle,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -16,7 +18,9 @@ const tabs = [
   { to: "/avulsos", label: "Avulsos", icon: Zap },
   { to: "/caixa", label: "Caixa", icon: Wallet },
   { to: "/membros", label: "Membros", icon: Users },
-  { to: "/publico", label: "Público", icon: Eye },
+  { to: "/gols", label: "Gols", icon: Trophy },
+  { to: "/publico", label: "Visão Pública", icon: Eye },
+  { to: "/tutorial", label: "Tutorial", icon: HelpCircle },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {

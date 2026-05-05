@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import type { Member, MensalidadePayment, Avulso, CaixaEntry } from "@/types";
+import { useState, useCallback } from "react";
+import type { Member, MensalidadePayment, Avulso, CaixaEntry, Jogo } from "@/types";
 import { format } from "date-fns";
 
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -32,6 +32,9 @@ export function useStore() {
   );
   const [caixa, setCaixaState] = useState<CaixaEntry[]>(() =>
     loadFromStorage("fdc_caixa", [])
+  );
+  const [jogos, setJogosState] = useState<Jogo[]>(() =>
+    loadFromStorage("fdc_jogos", [])
   );
   const [selectedMonth, setSelectedMonth] = useState<string>(() =>
     format(new Date(), "yyyy-MM")
@@ -72,6 +75,14 @@ export function useStore() {
     });
   }, []);
 
+  const setJogos = useCallback((v: Jogo[] | ((prev: Jogo[]) => Jogo[])) => {
+    setJogosState((prev) => {
+      const next = typeof v === "function" ? v(prev) : v;
+      saveToStorage("fdc_jogos", next);
+      return next;
+    });
+  }, []);
+
   // --- Members ---
   const addMember = useCallback(
     (data: Omit<Member, "id" | "createdAt">) => {
@@ -86,6 +97,28 @@ export function useStore() {
   const removeMember = useCallback(
     (id: string) => {
       setMembers((prev) => prev.filter((m) => m.id !== id));
+    },
+    [setMembers]
+  );
+
+  const updateMember = useCallback(
+    (id: string, data: Partial<Omit<Member, "id" | "createdAt">>) => {
+      setMembers((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, ...data } : m))
+      );
+    },
+    [setMembers]
+  );
+
+  const addMembers = useCallback(
+    (list: Omit<Member, "id" | "createdAt">[]) => {
+      const newMembers: Member[] = list.map((data) => ({
+        ...data,
+        id: uuid(),
+        createdAt: new Date().toISOString(),
+      }));
+      setMembers((prev) => [...prev, ...newMembers]);
+      return newMembers;
     },
     [setMembers]
   );
@@ -206,6 +239,27 @@ export function useStore() {
     [setCaixa]
   );
 
+  // --- Jogos (gols) ---
+  const addJogo = useCallback(
+    (jogo: Omit<Jogo, "id" | "createdAt">) => {
+      const newJogo: Jogo = {
+        ...jogo,
+        id: uuid(),
+        createdAt: new Date().toISOString(),
+      };
+      setJogos((prev) => [...prev, newJogo]);
+      return newJogo;
+    },
+    [setJogos]
+  );
+
+  const removeJogo = useCallback(
+    (id: string) => {
+      setJogos((prev) => prev.filter((j) => j.id !== id));
+    },
+    [setJogos]
+  );
+
   const saldoCaixa = caixa.reduce((acc, e) => acc + e.valor, 0);
   const totalEntradas = caixa.filter((e) => e.valor > 0).reduce((acc, e) => acc + e.valor, 0);
   const totalSaidas = caixa.filter((e) => e.valor < 0).reduce((acc, e) => acc + Math.abs(e.valor), 0);
@@ -215,15 +269,20 @@ export function useStore() {
     mensalidades,
     avulsos,
     caixa,
+    jogos,
     selectedMonth,
     setSelectedMonth,
     addMember,
     removeMember,
+    updateMember,
+    addMembers,
     getMensalidadeForMonth,
     toggleMensalidade,
     addAvulso,
     removeAvulso,
     addDespesa,
+    addJogo,
+    removeJogo,
     saldoCaixa,
     totalEntradas,
     totalSaidas,
